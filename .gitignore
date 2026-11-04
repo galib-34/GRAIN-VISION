@@ -1,9 +1,43 @@
-backend/.env
-backend/.venv/
-backend/venv/
-backend/Ultralytics/
-backend/app/__pycache__/
+# Secrets and local environment files
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+!**/.env.example
+
+# Python environments and caches
+.venv/
+**/.venv/
+venv/
+**/venv/
+__pycache__/
 **/__pycache__/
+.pytest_cache/
+**/.pytest_cache/
+.ruff_cache/
+**/.ruff_cache/
 *.py[cod]
+
+# JavaScript dependencies and build output
+node_modules/
+**/node_modules/
+dist/
+**/dist/
+build/
+**/build/
+coverage/
+**/coverage/
+*.tsbuildinfo
+
+# Local databases, WAL sidecars, and tool caches
 *.db
+*.db-shm
+*.db-wal
+*.sqlite
 *.sqlite3
+.cache/
+**/.cache/
+
+# Model training/runtime caches (model weights remain versioned in backend/models)
+backend/Ultralytics/

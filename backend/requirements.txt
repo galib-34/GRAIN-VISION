@@ -5,3 +5,4 @@ pillow
 ultralytics
 httpx
 python-dotenv
+google-auth

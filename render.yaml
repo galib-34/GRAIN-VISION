@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: grain-vision-api
+    runtime: docker
+    plan: 1c-2g
+    region: singapore
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    healthCheckPath: /api/health
+    autoDeployTrigger: commit
+    disk:
+      name: grain-vision-data
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: CORS_ORIGINS
+        sync: false
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: DATABASE_PATH
+        value: /var/data/grain_vision.db
+      - key: TRANSACTION_DATABASE_PATH
+        value: /var/data/transactions/grain_vision.db
+      - key: YOLO_MODEL_PATH
+        value: /app/models/train2.pt
+      - key: YOLO_CONFIDENCE
+        value: "0.25"
+      - key: MAX_IMAGE_BYTES
+        value: "20971520"

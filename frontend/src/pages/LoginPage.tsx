@@ -4,7 +4,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { GoogleLogin } from '@react-oauth/google'
 import './login-page.css'
 
-const API = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '')
+const API = (import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:8000' : '')).replace(/\/$/, '')
 const configuredGoogleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID?.trim() || ''
 const googleSignInEnabled = !!configuredGoogleClientId && !/^(your_actual_client_id_here|your-google-oauth-client-id)/i.test(configuredGoogleClientId)
 

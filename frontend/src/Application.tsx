@@ -16,7 +16,7 @@ import SupportPage from '@/pages/SupportPage'
 import MobileBottomNav from '@/components/MobileBottomNav'
 import PWAInstallCard from '@/components/PWAInstallCard'
 
-const API = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '')
+const API = (import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:8000' : '')).replace(/\/$/, '')
 const currency = (value?: number | null) => value == null ? '—' : `₹${Number(value).toLocaleString('en-IN', { maximumFractionDigits: 2 })}`
 type Farmer = { id: number; name: string; phone: string; location?: string; seller_code?: string }
 type Detection = { class: string; confidence: number; box: { x1: number; y1: number; x2: number; y2: number }; normalized_box?: { x1: number; y1: number; x2: number; y2: number } }

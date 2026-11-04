@@ -24,7 +24,7 @@ GRAIN-VISION is a mobile-first Progressive Web Application (PWA) and robust Pyth
 2. **Dynamic Routing & Safe CORS**:
    - Environment variables are loaded at the absolute entry point of `backend/app/main.py`.
    - Wildcard CORS (`*`) is strictly disallowed in production mode (`ENVIRONMENT=production`).
-   - The frontend (`frontend/app.js`) features dynamic environment resolution without hardcoding `127.0.0.1` or `localhost`, allowing mobile devices on local networks or secure HTTPS hosted domains to connect effortlessly.
+   - The React/Vite frontend uses `VITE_API_URL` for deployed API routing and falls back to `http://localhost:8000` during local development.
 
 3. **High-Density Grain & Low-Bandwidth Optimizations**:
    - **Client-Side Canvas Compression:** High-resolution mobile camera captures (12MP–48MP / 15MB+) are compressed on an HTML5 canvas prior to upload (~300 KB JPEG), preventing network timeouts over rural 3G/4G connections.
@@ -86,13 +86,23 @@ The API is accessible at `http://localhost:8000`, interactive OpenAPI documentat
 
 ### 2. Frontend PWA Setup
 
-In a second terminal, open the `frontend/` directory and serve the static files:
+In a second terminal, open the `frontend/` directory and start the React/Vite development server:
 
 ```bash
-python -m http.server 5500
+npm install
+npm run dev -- --host 0.0.0.0
 ```
 
-Open `http://localhost:5500` on your workstation, or open `http://<YOUR_LOCAL_IP>:5500` from a smartphone connected to the same Wi-Fi network.
+Open `http://localhost:5173` on your workstation, or use the displayed network address from a smartphone connected to the same Wi-Fi network. API requests default to `http://localhost:8000` during local development. For a deployed frontend, set `VITE_API_URL` to the API origin before building with `npm run build`.
+
+The production bundle in `frontend/dist/` includes the installable web manifest and service worker. The cached app shell opens offline; analysis and other API actions require a connection to the FastAPI backend.
+
+## Split-stack deployment
+
+- **Vercel:** Import the repository with the repository root as the project root. The root `vercel.json` installs and builds the Vite project from `frontend/`, publishes `frontend/dist/`, and routes SPA URLs to the app shell. Set `VITE_API_URL` and `VITE_GOOGLE_CLIENT_ID` in Vercel's project environment settings before building.
+- **Render:** Create a Blueprint from the root `render.yaml`. It builds `backend/Dockerfile`, starts FastAPI on Render's assigned port, checks `/api/health`, and stores both SQLite databases beneath `/var/data` on a persistent disk. Enter the exact Vercel site origin in `CORS_ORIGINS` and the Google OAuth client ID in `GOOGLE_CLIENT_ID` when prompted.
+
+The Render configuration uses a paid `1c-2g` web service and a 1 GB persistent disk so CPU inference has memory headroom and SQLite records survive restarts. Persistent disks are not available on free Render web services. If changing the disk mount path, keep `DATABASE_PATH` and `TRANSACTION_DATABASE_PATH` under that mount.
 
 Default demo officer credentials:
 - **Username:** `officer`
