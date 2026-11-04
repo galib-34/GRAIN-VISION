@@ -8,10 +8,7 @@ services:
     dockerContext: ./backend
     healthCheckPath: /api/health
     autoDeployTrigger: commit
-    disk:
-      name: grain-vision-data
-      mountPath: /var/data
-      sizeGB: 1
+    
     envVars:
       - key: ENVIRONMENT
         value: production
