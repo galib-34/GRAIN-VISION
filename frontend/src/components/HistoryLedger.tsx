@@ -1,0 +1,24 @@
+import { useEffect, useMemo, useState } from 'react'
+import { Search, X } from 'lucide-react'
+import { fetchLotHistory, type LotTransaction } from '@/services/api'
+import ReceiptModal from '@/components/ReceiptModal'
+import './history-ledger.css'
+
+const cash = (value: number) => `₹${Number(value).toLocaleString('en-IN', { maximumFractionDigits: 2 })}`
+export default function HistoryLedger() {
+  const [rows, setRows] = useState<LotTransaction[]>([])
+  const [query, setQuery] = useState('')
+  const [status, setStatus] = useState('')
+  const [selected, setSelected] = useState<LotTransaction | null>(null)
+  const [receipt, setReceipt] = useState<LotTransaction | null>(null)
+  const [error, setError] = useState('')
+  useEffect(() => { void fetchLotHistory({ limit: 200 }).then(setRows).catch(e => setError(e.message)) }, [])
+  const filtered = useMemo(() => rows.filter(row => (!status || row.status === status) && `${row.farmer_name} ${row.grain_type} ${row.id}`.toLowerCase().includes(query.toLowerCase())), [rows, query, status])
+  return <section className="panel history-panel"><div className="section-heading"><div><span className="step-label">PROCUREMENT RECORDS</span><h2>Transaction history</h2><p>Persisted lot valuations and itemized assessment details.</p></div><span className="model-tag">{filtered.length} RECORDS</span></div>
+    <div className="history-filters"><label><Search size={15}/><input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search farmer name or Lot ID" aria-label="Search farmer name or Lot ID"/></label><select value={status} onChange={e => setStatus(e.target.value)}><option value="">All statuses</option><option value="BUY">BUY</option><option value="BUY_WITH_CUT">BUY WITH CUT</option><option value="REJECT">REJECT</option></select></div>
+    {error && <p className="history-error">Could not load history: {error}</p>}
+    <div className="ledger-table history-table"><div className="ledger-header"><span>DATE / TIME</span><span>LOT ID</span><span>FARMER</span><span>STATUS</span><span>WEIGHT</span><span>EFFECTIVE RATE</span><span>PAYOUT</span><span>ACTIONS</span></div>{filtered.map(row => <button className="ledger-row history-row" key={row.id} onClick={() => setSelected(row)}><span data-label="Date / time">{new Date(row.timestamp).toLocaleString('en-IN')}</span><span data-label="Lot ID">{row.id.slice(0, 8)}</span><span data-label="Farmer">{row.farmer_name || 'Unassigned'}</span><span data-label="Status" className={`status-pill ${row.status.toLowerCase()}`}>{row.status.replaceAll('_', ' ')}</span><span data-label="Weight">{row.net_weight_kg} kg / {(row.net_weight_kg / 100).toFixed(2)} qtl</span><span data-label="Effective rate">{cash(row.effective_rate_per_kg)} / kg</span><b data-label="Payout">{cash(row.total_payout)}</b><span data-label="Actions" className="history-view">View details</span></button>)}{!filtered.length && !error && <div className="empty-ledger">No saved transactions match this filter.</div>}</div>
+    {selected && <div className="modal-backdrop" onMouseDown={e => { if (e.currentTarget === e.target) setSelected(null) }}><section className="dialog history-detail"><header><div><span className="step-label">VALUATION REPORT</span><h2>{selected.farmer_name || 'Unassigned farmer'} · {selected.grain_type}</h2></div><button className="icon-button" onClick={() => setSelected(null)}><X size={18}/></button></header><p className="dialog-copy">{new Date(selected.timestamp).toLocaleString('en-IN')} · {selected.status} · {selected.grade}</p><div className="history-financial"><span>Weight <b>{selected.net_weight_kg} kg</b></span><span>Base rate <b>{cash(selected.base_rate_per_quintal)} / qtl</b></span><span>Effective <b>{cash(selected.effective_rate_per_kg)} / kg</b></span><span>Total payout <b>{cash(selected.total_payout)}</b></span><span>Deduction <b>{cash(selected.total_deduction_per_kg)} / kg</b></span></div>{selected.rejection_reasons.length > 0 && <ul className="history-reasons">{selected.rejection_reasons.map((reason, i) => <li key={i}>{reason}</li>)}</ul>}<h3>Itemized deductions</h3>{selected.deductions.length ? <div className="history-detail-list">{selected.deductions.map((item, i) => <div key={i}><strong>{item.parameter}</strong><span>{item.observed_pct}% observed · {item.excess_pct}% excess</span><b>{cash(item.total_deduction_val)}</b></div>)}</div> : <p className="no-deductions">No slab deductions recorded.</p>}<h3>Mass composition</h3><div className="mass-chips">{Object.entries(selected.mass_percentages).map(([key, value]) => <span className="mass-chip" key={key}><small>{key.replaceAll('_', ' ')}</small><b>{Number(value).toFixed(2)}%</b></span>)}</div><div className="dialog-actions"><button className="button primary receipt-open-button" onClick={() => setReceipt(selected)}>View Receipt / Export PDF</button></div></section></div>}
+    {receipt && <ReceiptModal lot={receipt} close={() => setReceipt(null)}/>}
+  </section>
+}

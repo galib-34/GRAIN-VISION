@@ -1,0 +1,9 @@
+{
+  "variety": "Swarna (MTU 7029)",
+  "commodity": "Paddy (Common)",
+  "base_rate_per_quintal": 2441,
+  "base_rate_per_kg": 24.41,
+  "price_source": "Default MSP Baseline (₹2,441/qtl)",
+  "lot_weight_default_kg": 500,
+  "manual_moisture_default_pct": 13
+}
