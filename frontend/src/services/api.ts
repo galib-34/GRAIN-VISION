@@ -1,6 +1,6 @@
 import type { ValuationResult } from '@/types/procurement'
 
-const API = (import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:8000' : '')).replace(/\/$/, '')
+const API = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '')
 export interface SaveLotPayload {
   farmer_id?: string
   farmer_name: string

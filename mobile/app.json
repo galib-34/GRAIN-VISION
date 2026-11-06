@@ -1,0 +1,47 @@
+{
+  "expo": {
+    "name": "GRAIN-VISION",
+    "slug": "grain-vision",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#17351f"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "infoPlist": {
+        "NSCameraUsageDescription": "GRAIN-VISION uses your camera to capture rice samples for quality defect analysis.",
+        "NSPhotoLibraryUsageDescription": "GRAIN-VISION requires photo library access to upload sample images."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#17351f"
+      },
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE"
+      ]
+    },
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow GRAIN-VISION to access your camera to inspect grain lots."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow GRAIN-VISION to access your photo gallery to select grain sample images."
+        }
+      ]
+    ]
+  }
+}
